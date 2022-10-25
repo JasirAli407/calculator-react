@@ -35,7 +35,7 @@ function reducer(state, { type, payload }) {
         };
       }
 
-      if(payload.digit === "." && state.currOperand.includes("."))
+      if(payload.digit === "." && state.currOperand?.includes("."))
       {return state;}
 
       return {
@@ -56,6 +56,13 @@ function reducer(state, { type, payload }) {
         };
       }
 
+      if(state.overWrite){
+        return{
+          ...state,
+          overWrite:false, currOperand: state.currOperand.toString().slice(0, -1)
+        }
+      }
+
       if (state.currOperand) {
         return {
           ...state,
@@ -63,9 +70,7 @@ function reducer(state, { type, payload }) {
         };
       }
 
-    case ACTIONS.ALL_CLEAR:
-      return {};
-
+    
     case ACTIONS.SET_OPERATOR:
       if (!state.currOperand && !state.prevOperand) return state;
 
@@ -97,15 +102,19 @@ function reducer(state, { type, payload }) {
       }
 
       return {
-        currOperand: "",
+        prevOperand: "",
         operator: null,
-        currOperand: evaluate(state),
         overWrite: true,
+        currOperand: evaluate(state),
       };
 
+      case ACTIONS.ALL_CLEAR:
+        return {};
+  
     default:
       return state;
   }
+
 }
 
 
@@ -142,18 +151,13 @@ function evaluate({ prevOperand, currOperand, operator }) {
 function Calculator() {
 
   // v r using useReducer react hook to manage state
-  const [{ currOperand, prevOperand, operator }, dispatch] = useReducer(
+  const [state, dispatch] = useReducer(
     reducer,
     {}
   );
-  // console.log(
-  //   "currOperand:",
-  //   currOperand,
-  //   "prevOperand:",
-  //   prevOperand,
-  //   "operator:",
-  //   operator
-  // );
+  console.log(state);
+
+  const { currOperand, prevOperand, operator } = state
    
   // ui of the app
   return (
